@@ -39,6 +39,9 @@
             $user->phone = "+7" . $data['phone'];
             $user->admin = false;
             R::store($user);
+            $_SESSION['user_info'] = $user;
+            header("Location: index.php");
+            die();
         } else {
             echo "<div style=\"color: red; font-size: 16px;\">".array_shift($error)."</div>";
         }

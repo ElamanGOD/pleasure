@@ -1,3 +1,6 @@
+<?php 
+    require "db.php";
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -8,6 +11,14 @@
 </head>
 <body>
     <a href="login.php">Авторизоваться</a><br>
-    <a href="signup.php">Зарегистрироваться</a>
+    <a href="signup.php">Зарегистрироваться</a><br>
+    <?php 
+        if($_SESSION['user_info']->admin == 1){
+            echo "<a href=\"dashboard.php\">Админ панель</a><br>";
+        }
+        if($_SESSION['user_info']){
+            echo "<a href=\"order.php\">Заказать стол</a><br>";
+        }
+    ?>
 </body>
 </html>
