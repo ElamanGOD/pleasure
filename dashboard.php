@@ -5,7 +5,7 @@
     $error = array();
 
     function output_table(){
-        echo "<table border=\"1px\">
+        echo "<hr><table border=\"1px\">
             <caption style = \"font-size:28px\">Заказанные столы</caption>
             <tr>
                 <th>Номер стола</th>
@@ -72,6 +72,16 @@
             echo "<div style=\"color: red; font-size: 16px;\">".array_shift($error)."</div>";
         }
     }
+
+    if(isset($data['remove_food'])){
+        $snack = R::findOne("dishes","id = ?",array($data['deletefood']));
+        R::trash($snack);
+    }
+
+    if(isset($data['remove_type'])){
+        $grou = R::findOne("types","id = ?",array($data['deletetype']));
+        R::trash($grou);
+    }
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -98,7 +108,7 @@
         <input type="text" name="foodtype" id="foodtype"><br><br>
         <button type="submit" name="add_foodtype">Добавить</button>
     </form> 
-
+    <hr>
     <h1>Добавить еды</h1>
     <form action="dashboard.php" method="post">
         <label for="typefood">Тип еды</label><br><br>
@@ -117,6 +127,37 @@
         <input type="number" name="price" id="price"><br><br>
         <button type="submit" name="add_food">Добавить</button>
     </form> 
+    <hr>
+    <h1>Удалить еду</h1>
+    <form action="dashboard.php" method="post">
+        <label for="deletefood">Название еды</label><br><br>
+        <select name="deletefood" id="deletefood">
+            <?php 
+                $dishes = R::findAll("dishes");
+
+                foreach($dishes as $dish){
+                    echo "<option value = '$dish->id'> $dish->name </option>";
+                }
+            ?>
+        </select><br><br>
+        <button type="submit" name="remove_food">Удалить</button>
+    </form> 
+    <hr>
+    <h1>Удалить тип</h1>
+    <form action="dashboard.php" method="post">
+        <label for="deletetype">Название типа</label><br><br>
+        <select name="deletetype" id="deletetype">
+            <?php 
+                $groups = R::findAll("types");
+
+                foreach($groups as $group){
+                    echo "<option value = '$group->id'> $group->name </option>";
+                }
+            ?>
+        </select><br><br>
+        <button type="submit" name="remove_type">Удалить</button>
+    </form> 
+    <hr>
     <?php 
             output_food(); 
             output_table();
