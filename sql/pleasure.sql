@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Дек 08 2019 г., 18:21
+-- Время создания: Дек 08 2019 г., 19:53
 -- Версия сервера: 10.4.6-MariaDB
 -- Версия PHP: 7.3.9
 
@@ -32,7 +32,7 @@ CREATE TABLE `dishes` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `price` int(100) NOT NULL DEFAULT 0,
-  `type` varchar(100) NOT NULL
+  `type` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -40,7 +40,9 @@ CREATE TABLE `dishes` (
 --
 
 INSERT INTO `dishes` (`id`, `name`, `price`, `type`) VALUES
-(1, 'Зеленый листовой салат', 1300, 'Салаты и закуски');
+(1, 'Зеленый листовой салат', 1300, 1),
+(2, 'Греческий салат с баклажанами', 2100, 1),
+(3, 'Стейк рибай ', 5800, 3);
 
 -- --------------------------------------------------------
 
@@ -50,10 +52,10 @@ INSERT INTO `dishes` (`id`, `name`, `price`, `type`) VALUES
 
 CREATE TABLE `orderfood` (
   `id` int(11) UNSIGNED NOT NULL,
-  `dishid` tinyint(1) UNSIGNED DEFAULT NULL,
+  `dishid` int(11) NOT NULL,
   `tablenumber` int(11) UNSIGNED DEFAULT NULL,
   `quantity` int(11) UNSIGNED DEFAULT NULL,
-  `orderedby` tinyint(1) UNSIGNED DEFAULT NULL
+  `orderedby` int(11) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -95,7 +97,7 @@ CREATE TABLE `ordertable` (
   `number` int(11) UNSIGNED DEFAULT NULL,
   `date` date DEFAULT NULL,
   `time` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `orderedby` int(1) NOT NULL
+  `orderedby` int(11) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -106,6 +108,26 @@ INSERT INTO `ordertable` (`id`, `number`, `date`, `time`, `orderedby`) VALUES
 (1, 1, '2019-12-09', '19:30', 1),
 (2, 42, '2019-12-08', '20:00', 1),
 (4, 3, '2019-12-19', '22:02', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `types`
+--
+
+CREATE TABLE `types` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `types`
+--
+
+INSERT INTO `types` (`id`, `name`) VALUES
+(1, 'Салаты и закуски'),
+(2, 'Основные блюда традиционные'),
+(3, 'Рыба мясо овощи');
 
 -- --------------------------------------------------------
 
@@ -138,18 +160,28 @@ INSERT INTO `users` (`id`, `name`, `surname`, `email`, `password`, `phone`, `adm
 -- Индексы таблицы `dishes`
 --
 ALTER TABLE `dishes`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `type` (`type`);
 
 --
 -- Индексы таблицы `orderfood`
 --
 ALTER TABLE `orderfood`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `orderedby` (`orderedby`),
+  ADD KEY `dishid` (`dishid`);
 
 --
 -- Индексы таблицы `ordertable`
 --
 ALTER TABLE `ordertable`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `orderedby` (`orderedby`);
+
+--
+-- Индексы таблицы `types`
+--
+ALTER TABLE `types`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -166,7 +198,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT для таблицы `dishes`
 --
 ALTER TABLE `dishes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `orderfood`
@@ -181,10 +213,39 @@ ALTER TABLE `ordertable`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT для таблицы `types`
+--
+ALTER TABLE `types`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT для таблицы `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- Ограничения внешнего ключа сохраненных таблиц
+--
+
+--
+-- Ограничения внешнего ключа таблицы `dishes`
+--
+ALTER TABLE `dishes`
+  ADD CONSTRAINT `dishes_ibfk_1` FOREIGN KEY (`type`) REFERENCES `types` (`id`);
+
+--
+-- Ограничения внешнего ключа таблицы `orderfood`
+--
+ALTER TABLE `orderfood`
+  ADD CONSTRAINT `orderfood_ibfk_1` FOREIGN KEY (`orderedby`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `orderfood_ibfk_2` FOREIGN KEY (`dishid`) REFERENCES `dishes` (`id`);
+
+--
+-- Ограничения внешнего ключа таблицы `ordertable`
+--
+ALTER TABLE `ordertable`
+  ADD CONSTRAINT `ordertable_ibfk_1` FOREIGN KEY (`orderedby`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
